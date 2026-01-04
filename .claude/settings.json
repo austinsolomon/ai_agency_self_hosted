@@ -1,20 +1,26 @@
 {
   "permissions": {
-    "bash": {
-      "enabled": true,
-      "requireApproval": false
-    },
-    "read": {
-      "enabled": true
-    },
-    "write": {
-      "enabled": true,
-      "requireApproval": false
-    },
-    "edit": {
-      "enabled": true,
-      "requireApproval": false
-    }
+    "allow": [
+      "Bash(cp:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(curl:*)",
+      "Bash(sleep:*)",
+      "Bash(echo:*)",
+      "Bash(grep:*)",
+      "Bash(cat:*)",
+      "Bash(mkdir:*)",
+      "Bash(ls:*)",
+      "Bash(pwd:*)",
+      "Bash(git:*)",
+      "Bash(npm:*)",
+      "Bash(node:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(start:*)",
+      "Read",
+      "Write",
+      "Edit"
+    ]
   },
   "hooks": {}
 }

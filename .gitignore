@@ -1,0 +1,31 @@
+# Environment variables
+.env
+secret_dot_env
+
+# n8n local files
+n8n-local-files/
+
+# Docker volumes
+*.log
+
+# MCP n8n-mcp specific
+mcp/n8n-mcp/node_modules/
+mcp/n8n-mcp/dist/
+mcp/n8n-mcp/*.log
+mcp/n8n-mcp/test-output.txt
+mcp/n8n-mcp/fetch_log.txt
+mcp/n8n-mcp/coverage.json
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# n8n-mcp data
+mcp/n8n-mcp/data/
+
+# n8n-skills specific
+skills/n8n-skills/node_modules/
+skills/n8n-skills/dist/
+skills/n8n-skills/*.log
