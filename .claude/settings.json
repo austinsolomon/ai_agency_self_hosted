@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "bash": {
+      "enabled": true,
+      "requireApproval": false
+    },
+    "read": {
+      "enabled": true
+    },
+    "write": {
+      "enabled": true,
+      "requireApproval": false
+    },
+    "edit": {
+      "enabled": true,
+      "requireApproval": false
+    }
+  },
+  "hooks": {}
+}
