@@ -1,0 +1,13 @@
+{
+  "name": "wf_health_score_investigator",
+  "nodes": [
+    {"parameters":{"httpMethod":"POST","path":"baserow-cx-trigger","options":{}},"id":"0069f7fc-27b9-41b6-875c-e0747cf91209","name":"Baserow Webhook","type":"n8n-nodes-base.webhook","typeVersion":1.1,"position":[224,304],"webhookId":"baserow-cx-trigger"},
+    {"parameters":{"jsCode":"const payload = $input.first().json;\n\nconst required = ['row_id', 'account_id', 'account_name', 'segment', 'health_score', 'delta'];\nconst missing = required.filter(f => payload[f] === undefined || payload[f] === null);\nif (missing.length) {\n  throw new Error(`Missing required fields: ${missing.join(', ')}`);\n}\n\nlet signalJson = payload.signal_json;\nif (typeof signalJson === 'string') {\n  try { signalJson = JSON.parse(signalJson); } catch (e) { signalJson = { raw: signalJson }; }\n}\n\nreturn {\n  json: {\n    row_id: parseInt(payload.row_id),\n    record_id: payload.record_id || `rec_${payload.row_id}`,\n    account_id: payload.account_id,\n    account_name: payload.account_name,\n    segment: payload.segment,\n    health_score: parseFloat(payload.health_score),\n    delta: parseFloat(payload.delta),\n    signal_json: signalJson,\n    started_at: new Date().toISOString()\n  }\n};"},"id":"d9a0c9af-a139-45f2-8952-70ba3531da19","name":"Validate Payload","type":"n8n-nodes-base.code","typeVersion":2,"position":[448,304]},
+    {"parameters":{"respondWith":"json","responseBody":"={{ $json }}","options":{}},"id":"b096c65b-87aa-40df-a740-c1c3dab26655","name":"Respond to Webhook","type":"n8n-nodes-base.respondToWebhook","typeVersion":1,"position":[672,304]}
+  ],
+  "connections": {
+    "Baserow Webhook":{"main":[[{"node":"Validate Payload","type":"main","index":0}]]},
+    "Validate Payload":{"main":[[{"node":"Respond to Webhook","type":"main","index":0}]]}
+  },
+  "settings": {"executionOrder":"v1"}
+}

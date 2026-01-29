@@ -1,0 +1,105 @@
+{
+  "name": "wf_greek_translate",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": ["message"],
+        "additionalFields": {}
+      },
+      "id": "telegram-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "webhookId": "telegram-greek-001",
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Greek Translate Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCdr5CEMvm7nmJAyJlIVrYNz1lcfWUsi40",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"You are a Greek language assistant. For: \\\"\" + $json.message.text + \"\\\"\\n\\nRespond EXACTLY like this (plain text, no markdown):\\n\\n🔤 English: [input phrase]\\n🗣️ Pronunciation: [phonetic]\\n🇬🇷 Greek: [translation]\\n🔊 Greek pronunciation: [phonetic with English letters]\" }] }] }) }}",
+        "options": {}
+      },
+      "id": "gemini-api",
+      "name": "Gemini Translate",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response",
+              "name": "translation",
+              "value": "={{ $json.candidates?.[0]?.content?.parts?.[0]?.text || 'Translation error - please try again' }}",
+              "type": "string"
+            },
+            {
+              "id": "chatId",
+              "name": "chat_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "parse-response",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [750, 300]
+    },
+    {
+      "parameters": {
+        "operation": "sendMessage",
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.translation }}",
+        "additionalFields": {}
+      },
+      "id": "telegram-reply",
+      "name": "Send Reply",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1000, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Greek Translate Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [{ "node": "Gemini Translate", "type": "main", "index": 0 }]
+      ]
+    },
+    "Gemini Translate": {
+      "main": [
+        [{ "node": "Format Response", "type": "main", "index": 0 }]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [{ "node": "Send Reply", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

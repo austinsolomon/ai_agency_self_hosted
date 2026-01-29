@@ -1,0 +1,15 @@
+{
+  "name": "wf_snowflake_monitor",
+  "nodes": [
+    {"parameters":{"rule":{"interval":[{"field":"minutes","minutesInterval":30}]}},"id":"d32369d9-c51a-40b1-b653-55e924ef922f","name":"Schedule Trigger","type":"n8n-nodes-base.scheduleTrigger","typeVersion":1.1,"position":[-240,-80]},
+    {"parameters":{"documentId":{"__rl":true,"value":"https://docs.google.com/spreadsheets/d/1Ns9yX_Z03L2ftcQXvrXL910mMNC00nDdWRN3PkD6qBM/edit?gid=579524352#gid=579524352","mode":"url"},"sheetName":{"__rl":true,"value":"snowflake","mode":"name"},"options":{}},"id":"1dda937b-2b11-47cb-8894-06cddcd1c57e","name":"Read Snowflake Sheet","type":"n8n-nodes-base.googleSheets","typeVersion":4.4,"position":[16,-80]},
+    {"parameters":{"conditions":{"options":{"caseSensitive":true,"leftValue":"","typeValidation":"loose","version":3},"conditions":[{"id":"b474f9da-7b31-4e2b-a58f-45144800d5cd","leftValue":"={{ Math.abs(Number($json.Delta)) }}\n","rightValue":0.3,"operator":{"type":"number","operation":"gte"}}],"combinator":"and"},"looseTypeValidation":true,"options":{}},"type":"n8n-nodes-base.if","typeVersion":2.3,"position":[240,-80],"id":"0d889180-e94d-47b9-b98d-952a95bc3225","name":"If"},
+    {"parameters":{"operation":"create","databaseId":355272,"tableId":806083,"fieldsUi":{"fieldValues":[{"fieldId":6895307,"fieldValue":"={{$json.Account_ID}}   "},{"fieldId":6895308,"fieldValue":"={{ $json.Account_Name }}"},{"fieldId":6895339,"fieldValue":"={{ Number($json.Health_Score) }}"},{"fieldId":6895341,"fieldValue":"={{ $json.Previous_Score }}"},{"fieldId":6895342,"fieldValue":"={{ $json.Delta }}"},{"fieldId":6895343,"fieldValue":"={{ new Date($json.Last_Updated).toISOString().slice(0,10) }}"},{"fieldId":6895345,"fieldValue":"true"},{"fieldId":6895445,"fieldValue":"Waiting to Start"}]}},"type":"n8n-nodes-base.baserow","typeVersion":1,"position":[512,-96],"id":"2f8e24df-ce88-4f62-a93e-d58226109a63","name":"Create a row"}
+  ],
+  "connections": {
+    "Schedule Trigger":{"main":[[{"node":"Read Snowflake Sheet","type":"main","index":0}]]},
+    "Read Snowflake Sheet":{"main":[[{"node":"If","type":"main","index":0}]]},
+    "If":{"main":[[{"node":"Create a row","type":"main","index":0}],[]]}
+  },
+  "settings": {"executionOrder":"v1"}
+}

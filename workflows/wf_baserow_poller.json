@@ -1,0 +1,19 @@
+{
+  "name": "wf_baserow_poller",
+  "nodes": [
+    {"parameters":{"rule":{"interval":[{"field":"cronExpression","expression":"*/5 * * * *"}]}},"id":"7318b61c-3f3a-487d-8aba-5addb007667d","name":"Every 5 Minutes","type":"n8n-nodes-base.scheduleTrigger","typeVersion":1.1,"position":[-608,-528]},
+    {"parameters":{"conditions":{"string":[{"value1":"={{ $json.Dispatch_Agent.value }}","value2":"Start Agent"}]}},"id":"608b6308-e592-41d1-980a-c8ed75e0f0b4","name":"Rows Found?","type":"n8n-nodes-base.if","typeVersion":1,"position":[-160,-528],"alwaysOutputData":false},
+    {"parameters":{"jsCode":"return $input.all().map(item => {\n  const row = item.json;\n  return {\n    json: {\n      row_id: row.id,\n      record_id: `rec_${row.id}`,\n      account_id: row.Account_ID || 'UNKNOWN',\n      account_name: row.Account_Name || 'Unknown',\n      segment: row.Segment || 'Unknown',\n      health_score: parseFloat(row.Health_Score || 0.5),\n      delta: parseFloat(row.Delta || 0),\n      signal_json: {\n        trigger: 'health_score_drop',\n        source: 'baserow_poller',\n        original_status: row.Dispatch_Agent\n      },\n      started_at: new Date().toISOString()\n    }\n  };\n});"},"id":"2a71d045-e054-44d8-a412-9ebd443ed359","name":"Split Rows","type":"n8n-nodes-base.code","typeVersion":2,"position":[80,-656],"alwaysOutputData":true},
+    {"parameters":{"method":"POST","url":"http://host.docker.internal:8000/cx_signal","sendBody":true,"contentType":"raw","rawContentType":"application/json","body":"={{ JSON.stringify({\n  row_id: $json.id,\n  record_id: $json.record_id ?? `rec_${$json.id}`,\n  account_id: $json.Account_ID,\n  account_name: $json.Account_Name,\n  segment: $json.Segment ?? 'Unknown',\n  health_score: Number($json.Health_Score ?? 0),\n  delta: Number($json.Delta ?? 0),\n  signal_json: $json\n}) }}\n","options":{"timeout":120000}},"id":"209f410f-4d35-44d1-bee5-71322952a257","name":"Call FastAPI","type":"n8n-nodes-base.httpRequest","typeVersion":4.1,"position":[512,-656]},
+    {"parameters":{"databaseId":355272,"tableId":806083,"returnAll":true,"additionalOptions":{}},"type":"n8n-nodes-base.baserow","typeVersion":1,"position":[-384,-528],"id":"02f386e8-8ea8-4bbd-a333-2ae46341313e","name":"Get many rows"},
+    {"parameters":{"operation":"update","databaseId":355272,"tableId":806083,"rowId":"={{$json.row_id}}","fieldsUi":{"fieldValues":[{"fieldId":6895445,"fieldValue":"=Agent Investigating"}]}},"type":"n8n-nodes-base.baserow","typeVersion":1,"position":[288,-656],"id":"3b885aa0-fb2e-462a-8ff2-63ad88940ff0","name":"Update a row"}
+  ],
+  "connections": {
+    "Every 5 Minutes":{"main":[[{"node":"Get many rows","type":"main","index":0}]]},
+    "Rows Found?":{"main":[[{"node":"Split Rows","type":"main","index":0}]]},
+    "Split Rows":{"main":[[{"node":"Update a row","type":"main","index":0}]]},
+    "Get many rows":{"main":[[{"node":"Rows Found?","type":"main","index":0}]]},
+    "Update a row":{"main":[[{"node":"Call FastAPI","type":"main","index":0}]]}
+  },
+  "settings": {"executionOrder":"v1"}
+}
