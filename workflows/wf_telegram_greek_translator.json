@@ -22,7 +22,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCdr5CEMvm7nmJAyJlIVrYNz1lcfWUsi40",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={{ $env.GEMINI_API_KEY }}",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"You are a Greek language assistant. For: \\\"\" + $json.message.text + \"\\\"\\n\\nRespond EXACTLY like this (plain text, no markdown):\\n\\n🔤 English: [input phrase]\\n🗣️ Pronunciation: [phonetic]\\n🇬🇷 Greek: [translation]\\n🔊 Greek pronunciation: [phonetic with English letters]\" }] }] }) }}",
